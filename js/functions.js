@@ -42,20 +42,24 @@ var getInputPath = function(pathPhase){
 		inputPath = [];
 		if (copyInputPath.length == 0){
 			pathPhase[i].map(function(val){
-				inputPath.push(val);
+				let tempVal = copyArr(val);
+				for (let j=0;j<tempVal.length;j++){
+					tempVal[j] += 1;
+				}
+				inputPath.push(tempVal);
 			})
 		}
 		else {
 			pathPhase[i].map(function(val){
 				copyInputPath.map(function(v){
-					if (val[0] == v[v.length-1]){
+					if (val[0]+1 == v[v.length-1]){
 						let temp = copyArr(v);
-						temp.push(val[1]);
+						temp.push(val[1]+1);
 						inputPath.push(temp);
 					}
 				})
 			})
 		}
-		return inputPath;
 	}
+	return inputPath;
 }

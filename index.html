@@ -155,9 +155,20 @@
 							}
 						})
 						var path = bellman(num_attribute,num_phase,num_solution,costPhaseInput,pathPhaseInput);
-						// printInput(path[0].path);
 						var graphData = [];
-						var test = getInputPath(pathPhaseInput);
+						var graphInput = getInputPath(pathPhaseInput);
+						var dts = [];
+						for (let i=0;i<graphInput.length;i++){
+							let tempData = {
+								data: graphInput[i],
+								borderColor: "#ff0000",
+								fill: false,
+								pointRadius: 5,
+								pointBackgroundColor: '#ff0000'
+
+							}
+							dts.push(tempData);
+						}
 						for (let i=0;i<path[0].path.length;i++){
 							graphData[i] = path[0].path[i]+1;
 						}
@@ -205,31 +216,18 @@
 								data: graphData,
 								label: "Đường đi",
 								borderColor: "#3e95cd",
-								fill: false
+								fill: false,
+								pointRadius: 5,
+								pointBackgroundColor: '#ff0000'
 							}]
 						}
-						// var canvas = document.getElementById("graphOutput");
-						// var ctx = canvas.getContext("2d");
 						new Chart(document.getElementById("graphOut").getContext('2d'), {
 							type: 'line',
 							data: data,
 							options: options
 						})
-						var dataSet = [];
-						for (let i=0;i<num_phase;i++){
-							for (let j=0;j<pathPhaseInput[i].length;j++){
-								let temp = {
-									data: [],
-									borderColor: "#3e95cd",
-									fill: false
-								}
-								temp.data.push(pathPhaseInput[i][j][0]+1)
-								temp.data.push(pathPhaseInput[i][j][1]+1)
-								dataSet.push(temp);
-							}
-						}
 						var data1 = {
-							datasets: dataSet
+							datasets: dts
 						}
 						new Chart(document.getElementById("graphIn").getContext('2d'), {
 							type: 'line',
@@ -237,66 +235,6 @@
 							options: options
 						})
 					})
-					// var str1 = '<h3>Chọn đường đi</h3>';
-					// str1 += '<table class="table table-bordered">';
-					// for (let phase=0;phase<num_phase;phase++){
-					// 	str1 += '<tr>';
-					// 	str1 += '<th>Giai đoạn '+(phase+1)+'</th>';
-					// 	for (let i=0;i<num_solution;i++){
-					// 		str1 += '<td>';
-					// 		for (let j=0;j<num_solution;j++){
-					// 			str1 += '<input type="checkbox" name="pathArr['+phase+']" path-data="['+i+','+j+']" /> '+(i+1)+'-'+(j+1)+' | ';
-					// 		}
-					// 		str1 += '</td>';
-					// 	}
-					// 	str1 += '</tr>';
-					// }
-					// str1 += '</table>';
-					// str1 += '<button class="btn btn-primary" id="btnStep3">Xác nhận</button>';
-					// $('.costInit').html(str);
-					// $('.pathInit').html(str1);
-					// $('.costInit').slideDown("fast")
-					// $('.pathInit').slideDown("fast")
-					// $('#btnStep3').click(function(){
-					// 	for (let phase=0;phase<num_phase;phase++){
-					// 		costPhase[phase] = [];
-					// 		pathPhase[phase] = [];
-					// 		for (let solution=0;solution<num_solution;solution++){
-					// 			let tempCost = [];
-					// 			tempCost.push(parseInt($('input[name="costArr['+phase+']['+solution+']"]').val()));
-					// 			costPhase[phase].push(tempCost);
-					// 		}
-					// 		let pathArr = $('input[name="pathArr['+phase+']"]');
-					// 		pathArr.each(function(idx, val){
-					// 			if ($(val).prop('checked')){
-					// 				let tempPath = JSON.parse($(val).attr('path-data'));
-					// 				pathPhase[phase].push(tempPath);
-					// 			}
-					// 		})
-					// 	}
-					// 	var path = bellman(num_attribute,num_phase,num_solution,costPhase,pathPhase);
-					// 	// printInput(pathPhase);
-					// 	// console.log(path);
-					// 	if (path.length == 0){
-					// 		$('.result').html('<p>Lỗi</p>');
-					// 	}
-					// 	else{
-					// 		let str = '<h3>Kết quả</h3>';
-					// 		for (let i=0;i<path.length;i++){
-					// 			for (let j=0;j<path[i].path.length;j++){
-					// 				path[i].path[j] += 1;
-					// 			}
-					// 			pathStr = path[i].path.join(' - ');
-					// 			str += '<p>';
-					// 			str += 'Đường đi: '+pathStr;
-					// 			str += ' | Chi phí: '+path[i].cost[0];
-					// 			str += '</p>';
-					// 		}
-					// 		$('.result').html(str);
-					// 		$('.result').css("display", "block");
-					// 		$('#btnStep3').css("display", "none");
-					// 	}
-					// })
 				}
 			})
 			$('#btnReset').click(function(){
