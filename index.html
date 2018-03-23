@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Bài tập lớn Hệ chuyên gia</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" type="text/css" href="./css/fontawesome.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<script src="./js/jquery-3.1.1.min.js"></script>
+	<script src="./bootstrap/js/bootstrap.js"></script>
+	<script src="./js/def.js"></script>
+	<script src="./js/functions.js"></script>
+	<script src="./js/input.js"></script>
+	<script src="./js/main.js"></script>
+	<script src="./js/Chart.js"></script>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>Bài tập lớn Hệ chuyên gia</h1>
+			<h3>Thuật toán Bellman</h3>
+		</header><!-- /header -->
+		<div class="row">
+			<div class="col-xs-2">
+				<div class="left-sidebar">
+					<div class="error"></div>
+					<!-- <div class="form-group">
+						<label>Số tiêu chí</label>
+						<input type="text" name="num_attribute" placeholder="Nhập số tiêu chí" class="form-control">
+					</div> -->
+					<div class="form-group">
+						<label>Số phương án</label>
+						<input type="text" name="num_solution" placeholder="Nhập số phương án" class="form-control">
+					</div>
+					<div class="form-group">
+						<label>Số giai đoạn</label>
+						<input type="text" name="num_phase" placeholder="Nhập số giai đoạn" class="form-control">
+					</div>
+					<button class="btn btn-primary" id="btnStep1">Xác nhận</button>
+					<button class="btn btn-primary" id="btnReset">Làm lại</button>
+				</div>
+			</div>
+			<div class="col-xs-10">
+				<div class="content">
+					<ul class="nav nav-tabs">
+						<li class="active"><a data-toggle="tab" href="#cost">Chi phí</a></li>
+						<li><a data-toggle="tab" href="#path">Đầu vào</a></li>
+						<li><a data-toggle="tab" href="#graphInput">Sơ đồ đầu vào</a></li>
+						<li><a data-toggle="tab" href="#graphOutput">Sơ đồ kết quả</a></li>
+					</ul>
+				<div class="tab-content">
+					<div id="cost" class="tab-pane fade in active">
+						<h3>Chi phí</h3>
+						<div id="initCost"></div>
+					</div>
+					<div id="path" class="tab-pane fade">
+						<h3>Đầu vào</h3>
+						<div id="initPath"></div>
+					</div>
+					<div id="graphInput" class="tab-pane fade">
+						<h3>Sơ đồ đầu vào</h3>
+						<canvas id="graphIn"></canvas>
+					</div>
+					<div id="graphOutput" class="tab-pane fade">
+						<h3>Sơ đồ kết quả</h3>
+						<canvas id="graphOut"></canvas>
+					</div>
+				</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		$(document).ready(function(){
+			var costPhase = [];
+			var pathPhase = [];
+			var num_attribute = 1;
+			$('#btnStep1').click(function(){
+				var errorMessage = [];
+				// var num_attribute = parseInt($('input[name="num_attribute"]').val());
+				var num_solution = parseInt($('input[name="num_solution"]').val());
+				var num_phase = parseInt($('input[name="num_phase"]').val());
+				/*if (isNaN(num_attribute)) {
+					errorMessage.push('Bạn phải nhập số tiêu chí');
+				}*/
+				if (isNaN(num_solution)) {
+					errorMessage.push('Bạn phải nhập số phương án');
+				}
+				if (isNaN(num_phase)) {
+					errorMessage.push('Bạn phải nhập số giai đoạn');
+				}
+				if (errorMessage.length != 0){
+					$('.error').slideDown("fast");
+					$('.error').html(errorMessage.join('</br></br>'));
+				}
+				else {
+					$('#btnReset').css("display", "block");
+					$('#btnStep1').css("display", "none");
+					$('.error').text('');
+					$('.error').slideToggle("fast");
+					// var str = '<h3>Nhập chi phí</h3>';
+					var str = '<table class="table table-bordered">';
+					str += '<tr><th></th>';
+					for (let i=0;i<num_phase;i++){
+						str += '<th>Giai đoạn '+(i+1)+'</th>';
+					}
+					str += '</tr>';
+					for (let i=0;i<num_solution;i++){
+						str += '<tr><td>Phương án '+(i+1)+'</td>';
+						for (let j=0;j<num_phase;j++){
+							str += '<td><input type="text" name="costArr['+j+']['+i+']"></td>';
+						}
+						str += '</tr>';
+					}
+					str += '</table>';
+					$('#initCost').html(str);
+					$('#btnStep2').click(function(){
+						for (let phase=0;phase<num_phase;phase++){
+							costPhase[phase] = [];
+							for (let solution=0;solution<num_solution;solution++){
+								let tempCost = [];
+								tempCost.push(parseInt($('input[name="costArr['+phase+']['+solution+']"]').val()));
+								costPhase[phase].push(tempCost);
+							}
+						}
+						console.log(costPhase);
+					})
+					var str1 = '<table class="table table-bordered" id="pathTable">';
+					str1 += '<tr><th style="width:20px"><a class="addBtn" href=""><i class="glyphicon glyphicon-plus-sign"></i></a></th><th style="width:20%">Giai đoạn</th><th>Từ nút</th><th>Đến nút</th></tr>';
+					str1 += '</table>';
+					str1 += '<button class="btn btn-primary" id="btnStep3">Xác nhận</button>';
+					$('#initPath').html(str1);
+					$('.addBtn').click(function(){
+						addPath('pathTable', num_phase, num_solution);
+						return false;
+					})
+					$('#btnStep3').click(function(){
+						for (let phase=0;phase<num_phase;phase++){
+							costPhase[phase] = [];
+							for (let solution=0;solution<num_solution;solution++){
+								let tempCost = [];
+								tempCost.push(parseInt($('input[name="costArr['+phase+']['+solution+']"]').val()));
+								costPhase[phase].push(tempCost);
+							}
+						}
+						let arr = $('#pathTable tr');
+						emptyArr(pathPhase, num_solution);
+						arr.each(function(idx, val){
+							if (idx != 0){
+								let phase = parseInt($(val).find('select[name="sltPhase"]').val());
+								let from = parseInt($(val).find('select[name="sltFrom"]').val());
+								let to = parseInt($(val).find('select[name="sltTo"]').val());
+								pathPhase[phase].push([from, to]);
+							}
+						})
+						var path = bellman(num_attribute,num_phase,num_solution,costPhaseInput,pathPhaseInput);
+						// printInput(path[0].path);
+						var graphData = [];
+						var test = getInputPath(pathPhaseInput);
+						for (let i=0;i<path[0].path.length;i++){
+							graphData[i] = path[0].path[i]+1;
+						}
+						var xLabels = [];
+						var yLabels = [];
+						for (let i=0;i<num_phase+1;i++){
+							xLabels.push(i);
+						}
+						for (let i=num_solution-1;i>=0;i--){
+							yLabels.push(i+1);
+						}
+						var options = {
+							elements: {
+								line: {
+									tension: 0,
+								}
+							},
+							tooltips: {
+								enabled: false
+							},
+							scales: {
+								xAxes: [{
+									type: 'category',
+									labels: xLabels,
+									scaleLabel: {
+										display: true,
+										labelString: 'Giai đoạn'
+									}
+								}],
+								yAxes: [{
+									type: 'category',
+									labels: yLabels,
+									scaleLabel: {
+										display: true,
+										labelString: 'Phương án'
+									}
+								}]
+							},
+							legend: {
+								display: false
+							}
+						}
+						var data = {
+							datasets: [{
+								data: graphData,
+								label: "Đường đi",
+								borderColor: "#3e95cd",
+								fill: false
+							}]
+						}
+						// var canvas = document.getElementById("graphOutput");
+						// var ctx = canvas.getContext("2d");
+						new Chart(document.getElementById("graphOut").getContext('2d'), {
+							type: 'line',
+							data: data,
+							options: options
+						})
+						var dataSet = [];
+						for (let i=0;i<num_phase;i++){
+							for (let j=0;j<pathPhaseInput[i].length;j++){
+								let temp = {
+									data: [],
+									borderColor: "#3e95cd",
+									fill: false
+								}
+								temp.data.push(pathPhaseInput[i][j][0]+1)
+								temp.data.push(pathPhaseInput[i][j][1]+1)
+								dataSet.push(temp);
+							}
+						}
+						var data1 = {
+							datasets: dataSet
+						}
+						new Chart(document.getElementById("graphIn").getContext('2d'), {
+							type: 'line',
+							data: data1,
+							options: options
+						})
+					})
+					// var str1 = '<h3>Chọn đường đi</h3>';
+					// str1 += '<table class="table table-bordered">';
+					// for (let phase=0;phase<num_phase;phase++){
+					// 	str1 += '<tr>';
+					// 	str1 += '<th>Giai đoạn '+(phase+1)+'</th>';
+					// 	for (let i=0;i<num_solution;i++){
+					// 		str1 += '<td>';
+					// 		for (let j=0;j<num_solution;j++){
+					// 			str1 += '<input type="checkbox" name="pathArr['+phase+']" path-data="['+i+','+j+']" /> '+(i+1)+'-'+(j+1)+' | ';
+					// 		}
+					// 		str1 += '</td>';
+					// 	}
+					// 	str1 += '</tr>';
+					// }
+					// str1 += '</table>';
+					// str1 += '<button class="btn btn-primary" id="btnStep3">Xác nhận</button>';
+					// $('.costInit').html(str);
+					// $('.pathInit').html(str1);
+					// $('.costInit').slideDown("fast")
+					// $('.pathInit').slideDown("fast")
+					// $('#btnStep3').click(function(){
+					// 	for (let phase=0;phase<num_phase;phase++){
+					// 		costPhase[phase] = [];
+					// 		pathPhase[phase] = [];
+					// 		for (let solution=0;solution<num_solution;solution++){
+					// 			let tempCost = [];
+					// 			tempCost.push(parseInt($('input[name="costArr['+phase+']['+solution+']"]').val()));
+					// 			costPhase[phase].push(tempCost);
+					// 		}
+					// 		let pathArr = $('input[name="pathArr['+phase+']"]');
+					// 		pathArr.each(function(idx, val){
+					// 			if ($(val).prop('checked')){
+					// 				let tempPath = JSON.parse($(val).attr('path-data'));
+					// 				pathPhase[phase].push(tempPath);
+					// 			}
+					// 		})
+					// 	}
+					// 	var path = bellman(num_attribute,num_phase,num_solution,costPhase,pathPhase);
+					// 	// printInput(pathPhase);
+					// 	// console.log(path);
+					// 	if (path.length == 0){
+					// 		$('.result').html('<p>Lỗi</p>');
+					// 	}
+					// 	else{
+					// 		let str = '<h3>Kết quả</h3>';
+					// 		for (let i=0;i<path.length;i++){
+					// 			for (let j=0;j<path[i].path.length;j++){
+					// 				path[i].path[j] += 1;
+					// 			}
+					// 			pathStr = path[i].path.join(' - ');
+					// 			str += '<p>';
+					// 			str += 'Đường đi: '+pathStr;
+					// 			str += ' | Chi phí: '+path[i].cost[0];
+					// 			str += '</p>';
+					// 		}
+					// 		$('.result').html(str);
+					// 		$('.result').css("display", "block");
+					// 		$('#btnStep3').css("display", "none");
+					// 	}
+					// })
+				}
+			})
+			$('#btnReset').click(function(){
+				$('#btnStep1').css("display", "block");
+				$('input[name="num_phase"]').val('');
+				$('input[name="num_solution"]').val('');
+				// $('.costInit').html('');
+				// $('.pathInit').html('');
+				// $('.result').html('');
+				$(this).css("display", "none");
+			})
+			/*$('#btnTest').click(function(){
+				$('.result').html('');
+				var path = bellman(num_attributeInput,num_phaseInput,num_solutionInput,costPhaseInput,pathPhaseInput);
+				if (path.length == 0){
+					$('.result').html('<p>Lỗi</p>');
+				}
+				else{
+					let str = '<h3>Kết quả</h3>';
+					for (let i=0;i<path.length;i++){
+						for (let j=0;j<path[i].path.length;j++){
+							path[i].path[j] += 1;
+						}
+						pathStr = path[i].path.join(' - ');
+						str += '<p>';
+						str += 'Đường đi: '+pathStr;
+						str += ' | Chi phí: '+path[i].cost.join(' - ');
+						str += '</p>';
+					}
+					$('.result').html(str);
+					$('.result').css("display", "block");
+					$('#btnStep3').css("display", "none");
+				}
+			})*/
+		});
+
+		// var path = bellman(num_attribute,num_phase,num_solution,costPhaseInput,pathPhaseInput);
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Sơ đồ</title>
+	<link rel="stylesheet" href="">
+	<script src="./js/input.js"></script>
+	<script src="./js/Chart.js"></script>
+</head>
+<body>
+	<canvas id="line-chart" width="800" height="450"></canvas>
+	<script>
+		new Chart(document.getElementById("line-chart"), {
+			type: 'line',
+			data: {
+				datasets: [{
+					data: [1,2,3,4,5,6,7,8,9,10],
+					label: "Africa",
+					borderColor: "#3e95cd",
+					fill: false
+				}, {
+					data: [1,2,3,4,5,1,7,8,9,11],
+					label: "Africa",
+					borderColor: "#3e95cd",
+					fill: false
+				}, {
+					data: [1,2,3,4,5,6,7,8,10,11],
+					label: "Africa",
+					borderColor: "#3e95cd",
+					fill: false
+				}]
+			},
+			options: {
+				title: {
+					display: false,
+					text: 'World population per region (in millions)'
+				},
+				elements: {
+					line: {
+						tension: 0,
+					}
+				},
+				tooltips: {
+					enabled: false
+				},
+				scales: {
+					xAxes: [{
+						type: 'category',
+						labels: [1,2,3,4,5,6,7,8,9,10,11],
+						scaleLabel: {
+							display: true,
+							labelString: 'Giai đoạn'
+						}
+					}],
+					yAxes: [{
+						type: 'category',
+						labels: [11,10,9,8,7,6,5,4,3,2,1],
+						scaleLabel: {
+							display: true,
+							labelString: 'Phương án'
+						}
+					}]
+				},
+				legend: {
+					display: false
+				}
+			}
+		});
+	</script>
+</body>
+</html>

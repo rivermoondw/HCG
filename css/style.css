@@ -1,0 +1,31 @@
+header {
+	border-bottom: 1px solid #000;
+	margin-bottom: 30px;
+}
+.error {
+	margin-bottom: 10px;
+	display: none;
+}
+.content {
+	border-left: 1px solid #000;
+	padding-left: 10px;
+}
+.costInit {
+	display: none;
+}
+.pathInit {
+	display: none;
+}
+.result {
+	margin-top: 20px;
+	display: none;
+}
+#btnReset {
+	display: none;
+}
+.addBtn {
+	color: green;
+}
+.delBtn {
+	color: red;
+}
