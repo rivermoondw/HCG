@@ -22,7 +22,7 @@
 			<h3>Thuật toán Bellman</h3>
 		</header><!-- /header -->
 		<div class="row">
-			<div class="col-xs-2">
+			<div class="col-xs-3">
 				<div class="left-sidebar">
 					<div class="error"></div>
 					<!-- <div class="form-group">
@@ -42,7 +42,7 @@
 					<button class="btn btn-primary" id="btnTest">Test</button>
 				</div>
 			</div>
-			<div class="col-xs-10">
+			<div class="col-xs-9">
 				<div class="content">
 					<ul class="nav nav-tabs">
 						<li class="active"><a data-toggle="tab" href="#cost">Chi phí</a></li>
@@ -96,7 +96,7 @@
 					$('.error').html(errorMessage.join('</br></br>'));
 				}
 				else {
-					$('#btnReset').css("display", "block");
+					$('#btnReset').css("display", "inline-block");
 					$('#btnStep1').css("display", "none");
 					$('.error').text('');
 					$('.error').slideToggle("fast");
@@ -231,7 +231,7 @@
 				location.reload();
 			})
 			$('#btnTest').click(function(){
-				$('#btnReset').css("display", "block");
+				$('#btnReset').css("display", "inline-block");
 				$('#btnStep1').css("display", "none");
 				$('input[name="num_solution"]').val('3')
 				$('input[name="num_phase"]').val('3')
