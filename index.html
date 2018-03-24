@@ -39,6 +39,7 @@
 					</div>
 					<button class="btn btn-primary" id="btnStep1">Xác nhận</button>
 					<button class="btn btn-primary" id="btnReset">Làm lại</button>
+					<button class="btn btn-primary" id="btnTest">Test</button>
 				</div>
 			</div>
 			<div class="col-xs-10">
@@ -115,17 +116,6 @@
 					}
 					str += '</table>';
 					$('#initCost').html(str);
-					$('#btnStep2').click(function(){
-						for (let phase=0;phase<num_phase;phase++){
-							costPhase[phase] = [];
-							for (let solution=0;solution<num_solution;solution++){
-								let tempCost = [];
-								tempCost.push(parseInt($('input[name="costArr['+phase+']['+solution+']"]').val()));
-								costPhase[phase].push(tempCost);
-							}
-						}
-						console.log(costPhase);
-					})
 					var str1 = '<table class="table table-bordered" id="pathTable">';
 					str1 += '<tr><th style="width:20px"><a class="addBtn" href=""><i class="glyphicon glyphicon-plus-sign"></i></a></th><th style="width:20%">Giai đoạn</th><th>Từ nút</th><th>Đến nút</th></tr>';
 					str1 += '</table>';
@@ -154,9 +144,9 @@
 								pathPhase[phase].push([from, to]);
 							}
 						})
-						var path = bellman(num_attribute,num_phase,num_solution,costPhaseInput,pathPhaseInput);
+						var path = bellman(num_attribute,num_phase,num_solution,costPhase,pathPhase);
 						var graphData = [];
-						var graphInput = getInputPath(pathPhaseInput);
+						var graphInput = getInputPath(pathPhase);
 						var dts = [];
 						for (let i=0;i<graphInput.length;i++){
 							let tempData = {
@@ -238,13 +228,118 @@
 				}
 			})
 			$('#btnReset').click(function(){
-				$('#btnStep1').css("display", "block");
-				$('input[name="num_phase"]').val('');
-				$('input[name="num_solution"]').val('');
-				// $('.costInit').html('');
-				// $('.pathInit').html('');
-				// $('.result').html('');
-				$(this).css("display", "none");
+				location.reload();
+			})
+			$('#btnTest').click(function(){
+				$('#btnReset').css("display", "block");
+				$('#btnStep1').css("display", "none");
+				$('input[name="num_solution"]').val('3')
+				$('input[name="num_phase"]').val('3')
+				var str = '<table class="table table-bordered">';
+				str += '<tr><th></th>';
+				for (let i=0;i<num_phaseInput;i++){
+					str += '<th>Giai đoạn '+(i+1)+'</th>';
+				}
+				str += '</tr>';
+				for (let i=0;i<num_solutionInput;i++){
+					str += '<tr><td>Phương án '+(i+1)+'</td>';
+					for (let j=0;j<num_phaseInput;j++){
+						str += '<td>'+costPhaseInput[i][j][0]+'</td>';
+					}
+					str += '</tr>';
+				}
+				str += '</table>';
+				$('#initCost').html(str);
+				var str1 = '<table class="table table-bordered" id="pathTable">';
+				str1 += '<tr><th style="width:20%">Giai đoạn</th><th>Từ nút</th><th>Đến nút</th></tr>';
+				for (let i=0;i<num_phaseInput;i++){
+					for (let j=0;j<pathPhaseInput[i].length;j++){
+						str1 += '<tr><td>'+(i+1)+'</td><td>'+(pathPhaseInput[i][j][0]+1)+'</td><td>'+(pathPhaseInput[i][j][1]+1)+'</td></tr>'
+					}
+				}
+				str1 += '</table>';
+				str1 += '<button class="btn btn-primary" id="btnStep3">Xác nhận</button>';
+				$('#initPath').html(str1);
+				var path = bellman(num_attributeInput,num_phaseInput,num_solutionInput,costPhaseInput,pathPhaseInput);
+				var graphData = [];
+				var graphInput = getInputPath(pathPhaseInput);
+				var dts = [];
+				for (let i=0;i<graphInput.length;i++){
+					let tempData = {
+						data: graphInput[i],
+						borderColor: "#ff0000",
+						fill: false,
+						pointRadius: 5,
+						pointBackgroundColor: '#ff0000'
+
+					}
+					dts.push(tempData);
+				}
+				for (let i=0;i<path[0].path.length;i++){
+					graphData[i] = path[0].path[i]+1;
+				}
+				var xLabels = [];
+				var yLabels = [];
+				for (let i=0;i<num_phaseInput+1;i++){
+					xLabels.push(i);
+				}
+				for (let i=num_solutionInput-1;i>=0;i--){
+					yLabels.push(i+1);
+				}
+				var options = {
+					elements: {
+						line: {
+							tension: 0,
+						}
+					},
+					tooltips: {
+						enabled: false
+					},
+					scales: {
+						xAxes: [{
+							type: 'category',
+							labels: xLabels,
+							scaleLabel: {
+								display: true,
+								labelString: 'Giai đoạn'
+							}
+						}],
+						yAxes: [{
+							type: 'category',
+							labels: yLabels,
+							scaleLabel: {
+								display: true,
+								labelString: 'Phương án'
+							}
+						}]
+					},
+					legend: {
+						display: false
+					}
+				}
+				var data = {
+					datasets: [{
+						data: graphData,
+						label: "Đường đi",
+						borderColor: "#3e95cd",
+						fill: false,
+						pointRadius: 5,
+						pointBackgroundColor: '#ff0000'
+					}]
+				}
+				new Chart(document.getElementById("graphOut").getContext('2d'), {
+					type: 'line',
+					data: data,
+					options: options
+				})
+				var data1 = {
+					datasets: dts
+				}
+				new Chart(document.getElementById("graphIn").getContext('2d'), {
+					type: 'line',
+					data: data1,
+					options: options
+				})
 			})
 			/*$('#btnTest').click(function(){
 				$('.result').html('');
